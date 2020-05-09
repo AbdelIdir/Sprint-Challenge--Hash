@@ -16,72 +16,73 @@ class HashTable:
 
 
 def hash(x, storageability):
-    x = ((x >> 16) ^ x) * 0x45d9f3b
-    x = ((x >> 16) ^ x) * 0x45d9f3b
-    x = ((x >> 16) ^ x)
 
-    return x % storageability
+    hash = 5381
+    for char in x:
+        hash = ((hash << 5) + hash) + ord(char)
+        return hash % storageability
+
 
 
 def hash_table_insert(hash_table, key, value):
     index = hash(key, len(hash_table.storage))
 
-    current_pair = hash_table.storage[index]
-    last_pair = None
+    current_node = hash_table.storage[index]
+    last_node = None
 
-    while current_pair is not None and current_pair.key != key:
-        last_pair = current_pair
-        current_pair = last_pair.next
+    while current_node is not None and current_node.key != key:
+        last_node = current_node
+        current_node = last_node.next
 
-    if current_pair is not None:
-        current_pair.value = value
+    if current_node is not None:
+        current_node.value = value
     else:
-        new_pair = HashTableEntry(key, value)
-        new_pair.next = hash_table.storage[index]
-        hash_table.storage[index] = new_pair
+        new_node = HashTableEntry(key, value)
+        new_node.next = hash_table.storage[index]
+        hash_table.storage[index] = new_node
 
 
 def hash_table_remove(hash_table, key):
     index = hash(key, len(hash_table.storage))
 
-    current_pair = hash_table.storage[index]
-    last_pair = None
+    current_node = hash_table.storage[index]
+    last_node = None
 
-    while current_pair is not None and current_pair.key != key:
-        last_pair = current_pair
-        current_pair = last_pair.next
+    while current_node is not None and current_node.key != key:
+        last_node = current_node
+        current_node = last_node.next
 
-    if current_pair is None:
+    if current_node is None:
         print("No entry to be removed")
     else:
-        if last_pair is None:  
-            hash_table.storage[index] = current_pair.next
+        if last_node is None:  
+            hash_table.storage[index] = current_node.next
         else:
-            last_pair.next = current_pair.next
+            last_node.next = current_node.next
 
 
 def hash_table_retrieve(hash_table, key):
     index = hash(key, len(hash_table.storage))
 
-    current_pair = hash_table.storage[index]
+    current_node = hash_table.storage[index]
 
-    while current_pair is not None:
-        if(current_pair.key == key):
-            return current_pair.value
-        current_pair = current_pair.next
+    while current_node is not None:
+        if(current_node.key == key):
+            return current_node.value
+        current_node = current_node.next
 
 
 def hash_table_resize(hash_table):
     new_hash_table = HashTable(2 * len(hash_table.storage))
 
-    current_pair = None
+    current_node = None
 
     for i in range(len(hash_table.storage)):
-        current_pair = hash_table.storage[i]
-        while current_pair is not None:
+        current_node = hash_table.storage[i]
+        while current_node is not None:
             hash_table_insert(new_hash_table,
-                              current_pair.key,
-                              current_pair.value)
-            current_pair = current_pair.next
+                              current_node.key,
+                              current_node.value)
+            current_node = current_node.next
 
     return new_hash_table
